@@ -1,0 +1,26 @@
+---
+#Default region for deploying Custom Control Tower: Code Pipeline, Step functions, Lambda, SSM parameters, and StackSets
+region: us-east-1
+version: 2020-01-01
+
+# Control Tower Custom Service Control Policies
+organization_policies: []
+
+# Control Tower Custom CloudFormation Resources
+cloudformation_resources:
+  # -----------------------------------------------------------------------------
+  # S3 Block Account Public Access Solution
+  # -----------------------------------------------------------------------------
+  - name: sra-s3-block-account-public-access-main-ssm
+    template_file: templates/sra-s3-block-account-public-access-main-ssm.yaml
+    parameter_file: parameters/sra-s3-block-account-public-access-main-ssm.json
+    deploy_method: stack_set
+    deploy_to_account:
+      - REPLACE_ME_ORG_MANAGEMENT_ACCOUNT_NAME
+
+  # - name: sra-s3-block-account-public-access-main
+  #   template_file: templates/sra-s3-block-account-public-access-main.yaml
+  #   parameter_file: parameters/sra-s3-block-account-public-access-main.json
+  #   deploy_method: stack_set
+  #   deploy_to_account:
+  #     - REPLACE_ME_ORG_MANAGEMENT_ACCOUNT_NAME
