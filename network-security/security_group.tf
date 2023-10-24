@@ -1,25 +1,86 @@
-resource "aws_security_group" "sg-app" {
-  name        = "app-sg"
-  description = "Security Group app"
-  vpc_id      = aws_vpc.vpc.id
+resource "aws_wafv2_web_acl" "thiswaf" {
+  name        = "sandbox-prod-waf-cf"
+  description = "sandbox-prod-waf-cf"
+  scope       = "CLOUDFRONT"
 
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb-sg.id]
+  default_action {
+    allow {}
   }
 
-  egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    cidr_blocks = [
-    "0.0.0.0/0"]
+  rule {
+    name     = "rule-1"
+    priority = 1
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = false
+      metric_name                = "AWSManagedRulesCommonRuleSet-metric"
+      sampled_requests_enabled   = false
+    }
+  }
+  rule {
+    name     = "rule-2"
+    priority = 2
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = false
+      metric_name                = "AWSManagedRulesKnownBadInputsRuleSet-metric"
+      sampled_requests_enabled   = false
+    }
   }
 
-  tags = {
-    Name        = format("%s-%s-app-sg", var.customer, var.environment)
-    Environment = var.environment
+  rule {
+    name     = "rule-3"
+    priority = 3
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesPHPRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = false
+      metric_name                = "AWSManagedRulesPHPRuleSet-metric"
+      sampled_requests_enabled   = false
+    }
+  }
+
+
+
+  tags = merge(local.common_tags, {
+    Name                = format("%s-%s-waf-cf", var.Customer, var.environment),
+  })
+
+  visibility_config {
+    cloudwatch_metrics_enabled = false
+    metric_name                = "sandbox-prod-metric-name"
+    sampled_requests_enabled   = false
   }
 }
