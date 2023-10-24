@@ -1,7 +1,7 @@
-resource "aws_wafv2_web_acl" "waf" {
-  name        = "customer-waf" //CHANGE
-  description = "customer-waf"//CHANGE
-  scope       = "REGIONAL"
+resource "aws_wafv2_web_acl" "thiswaf" {
+  name        = "sandbox-prod-waf-cf"
+  description = "sandbox-prod-waf-cf"
+  scope       = "CLOUDFRONT"
 
   default_action {
     allow {}
@@ -74,14 +74,13 @@ resource "aws_wafv2_web_acl" "waf" {
 
 
 
-  tags = {
-    Tag1 = "" //CHANGE
-    Tag2 = "Production"
-  }
+  tags = merge(local.common_tags, {
+    Name                = format("%s-%s-waf-cf", var.Customer, var.environment),
+  })
 
   visibility_config {
     cloudwatch_metrics_enabled = false
-    metric_name                = "waf-metrics" //CHANGE
+    metric_name                = "sandbox-prod-metric-name"
     sampled_requests_enabled   = false
   }
 }
