@@ -1,13 +1,13 @@
 resource "aws_security_group" "sg-app" {
   name        = "app-sg"
   description = "Security Group app"
-  vpc_id      = aws_vpc.vpc.id
+  vpc_id      = "vpc-0916d84df8a768429"
 
   ingress {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb-sg.id]
+    security_groups = ["sg-0f6a902391b8aeeda"]
   }
 
   egress {
@@ -19,7 +19,7 @@ resource "aws_security_group" "sg-app" {
   }
 
   tags = {
-    Name        = format("%s-%s-app-sg", var.customer, var.environment)
+    Name        = format("%s-%s-app-sg", var.project, var.environment)
     Environment = var.environment
   }
 }
